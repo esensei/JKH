@@ -1,47 +1,43 @@
-import React, {Component} from "react";
+import React, {Component} from 'react'
 import {
   View,
   Text,
   StyleSheet,
-  Image,
-  TextInput,
-  TouchableOpacity,
-  Button
-} from "react-native"
+  TouchableOpacity
+} from 'react-native'
 
 import LinearGradient from 'react-native-linear-gradient'
 
 class ServicesNavigator extends Component {
-
   header: {
     visible: false
   }
 
   render() {
-    const {buttonContainer, buttonStyle, linearGradient, container, body} = styles
-    return (<LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient}>
-
-      <View style={body}>
-        <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('TopTapBar')}>
-          <Text style={buttonStyle}>Домофон</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('InfoContainer')}>
-          <Text style={buttonStyle}>Заказать воду</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-          <Text style={buttonStyle}>Уборка квартиры</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-          <Text style={buttonStyle}>Мастер на дом</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-          <Text style={buttonStyle}>Трансфер</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-          <Text style={buttonStyle}>Показания ЖКХ</Text>
-        </TouchableOpacity>
-      </View>
-    </LinearGradient>);
+    const {buttonContainer, buttonStyle, linearGradient, body} = styles
+    return (
+      <LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient}>
+        <View style={body}>
+          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('TopTapBar')}>
+            <Text style={buttonStyle}>Домофон</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('InfoContainer')}>
+            <Text style={buttonStyle}>Заказать воду</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
+            <Text style={buttonStyle}>Уборка квартиры</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
+            <Text style={buttonStyle}>Мастер на дом</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
+            <Text style={buttonStyle}>Трансфер</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
+            <Text style={buttonStyle}>Показания ЖКХ</Text>
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>)
   }
 }
 
@@ -85,4 +81,4 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#5282F0'
   }
-});
+})

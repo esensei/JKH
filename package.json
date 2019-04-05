@@ -16,6 +16,7 @@
     "react-native-check-box": "^2.1.7",
     "react-native-checkbox-form": "^1.1.5",
     "react-native-gesture-handler": "^1.0.16",
+    "react-native-iphone-x-helper": "^1.2.0",
     "react-native-linear-gradient": "^2.5.3",
     "react-native-modal-datetime-picker": "^6.1.0",
     "react-native-picker-select": "^6.1.0",
@@ -26,7 +27,8 @@
   "devDependencies": {
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "24.1.0",
-    "eslint": "^5.15.3",
+    "eslint": "^5.16.0",
+    "eslint-config-equimper": "^2.2.2",
     "eslint-plugin-react": "^7.12.4",
     "eslint-plugin-react-native": "^3.6.0",
     "jest": "24.1.0",

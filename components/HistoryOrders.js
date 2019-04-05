@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {Component} from 'react'
 import {
   View,
   Text,
@@ -7,18 +7,21 @@ import {
   TouchableOpacity
 } from 'react-native'
 
-export default class ActiveOrders extends React.Component {
+export default class HistoryOrders extends Component {
+  onHandle = () => {
+    this.props.onClick(this.props.date, getStatus(this.props.status), this.props.seller)
+  }
   render() {
-    const {container, h1, h2, image, stringContainer} = style
+    const {container, h1, h2, image, stringContainer} = styles
     return (
-      <TouchableOpacity style={container}>
+      <TouchableOpacity onPress={this.onHandle} style={container}>
         <View style={stringContainer}>
           <Text style={h1}>Заказ от {this.props.date}</Text>
           <Image style={image}source={require('../images/cardTap.png')} />
         </View>
         <View style={stringContainer}>
           <Text style={h2}>Статус экрана</Text>
-          <Text style={[h2, {color: 'rgba(82,130,240,1)'}]}>Активный</Text>
+          <Text style={h2}>{getStatus(this.props.status)}</Text>
         </View>
         <View style={stringContainer}>
           <Text style={h2}>Дата доставки</Text>
@@ -41,23 +44,20 @@ function getStatus(status) { //status=(closed|cancel)
   switch (status) {
   case 'closed':
     return (
-      <Text style={[h2, {color: 'rgba(64,193,67,1)'}]}>Завершен</Text>
+      <Text style={[styles.h2, {color: 'rgba(64,193,67,1)'}]}>Завершен</Text>
     )
-    break
-  case 'cancel':
+  case 'canceled':
     return (
-      <Text style={[h2, {color: 'rgba(201,63,63,1)'}]}>Отменен</Text>
+      <Text style={[styles.h2, {color: 'rgba(201,63,63,1)'}]}>Отменен</Text>
     )
-    break
   default:
     return (
-      <Text style={[h2, {color: 'rgba(201,63,63,1)'}]}>Ошибка статуса заказа</Text>
+      <Text style={[styles.h2, {color: 'rgba(201,63,63,1)'}]}>Ошибка статуса заказа</Text>
     )
-    break
   }
 }
 
-const style = StyleSheet.create({
+const styles = StyleSheet.create({
   container: {
     marginTop: 20
   },

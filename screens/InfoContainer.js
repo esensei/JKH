@@ -1,30 +1,24 @@
-import React, { Component } from "react";
-import PropTypes from 'prop-types'
+import React, { Component } from 'react'
 import LinearGradient from 'react-native-linear-gradient'
-
+import { ifIphoneX } from 'react-native-iphone-x-helper'
+import {
+  StyleSheet,
+  Dimensions,
+  Text,
+  TouchableOpacity
+} from 'react-native'
 import HeadNavigator from '../components/HeadNavigator'
 
-import {
-    View,
-    Text,
-    StyleSheet,
-    Image,
-    TextInput,
-    Dimensions,
-    TouchableOpacity,
-    Button
-} from "react-native"
-
-
-var width = Dimensions.get('window').width; //full width
-var height = Dimensions.get('window').height; //full height
+const width = Dimensions.get('window').width
+const height = Dimensions.get('window').height
 
 class InfoContainer extends Component {
-  render(){
-    const {h2, h3, header, headerText, buttonTextOther, orderText, orderButton, orderContainer, buttonTextCenter, countButton, countButtonMinus, countButtonPlus, countButtonCenter, linearGradient, dataPicker, container,placeContainer, pickerContainer} = styles
-    return(
+  render() {
+    const {linearGradient, h1, container} = styles
+    return (
       <LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient}>
-        <TouchableOpacity disabled={true} style={container}>
+        <Text style={h1}>Заказать воду</Text>
+        <TouchableOpacity disabled style={container}>
           <HeadNavigator />
         </TouchableOpacity>
       </LinearGradient>
@@ -36,9 +30,18 @@ const styles = StyleSheet.create({
   linearGradient: {
     flex: 1,
     borderRadius: 5,
-    paddingTop: 60,
+    ...ifIphoneX({
+      paddingTop: 0.05 * height
+    }, {
+      paddingTop: 0.01 * height
+    })
   },
-
+  h1: {
+    fontSize: 18,
+    textAlign: 'center',
+    color: 'white',
+    marginBottom: 0.013 * height
+  },
   container: {
     shadowColor: 'rgba(0,0,0, .4)', // IOS
     shadowOffset: { height: 1, width: 1 }, // IOS
@@ -50,8 +53,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopLeftRadius: 13,
     borderTopRightRadius: 13,
-
-    height: height,
+    height
   }
 })
 

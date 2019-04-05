@@ -1,86 +1,49 @@
-import React, {Component} from 'react'
-import PropTypes from 'prop-types'
-import {createMaterialTopTabNavigator, createAppContainer} from 'react-navigation'
+import React from 'react'
+import {createMaterialTopTabNavigator, createStackNavigator, createAppContainer} from 'react-navigation'
+import {View, Text, StyleSheet} from 'react-native'
+
 import SecondActivity from '../screens/SecondActivity'
 import GetWater from '../screens/GetWater'
-
-import {StyleSheet, View, Text, Image} from "react-native"
+import DetailsOrder from './DetailsOrder'
 
 const HeadNavigator = createMaterialTopTabNavigator({
-
   Заказ: {
     screen: GetWater,
     navigationOptions: {
-
-      tabBarLabel: ({focused, tintColor}) => (
+      tabBarLabel: ({focused}) => (
         focused
-        ? <View style={{
-            paddingVertical: 7,
-            paddingHorizontal: 20,
-            flex: 1,
-            alignSelf: 'flex-end',
-            borderColor: 'rgba(82,130,240,1)',
-            borderTopLeftRadius: 5,
-            borderBottomLeftRadius: 5,
-            backgroundColor: 'rgba(82,130,240,1)',
-            borderWidth: 1
-          }}>
-          <Text style={{
-              color: 'white'
-            }}>Второй экран</Text>
-        </View>
-        : <View style={{
-            paddingVertical: 7,
-            paddingHorizontal: 20,
-            alignSelf: 'flex-end',
-            borderColor: 'rgba(82,130,240,1)',
-            borderTopLeftRadius: 5,
-            borderBottomLeftRadius: 5,
-            backgroundColor: 'white',
-            borderWidth: 1
-          }}>
-          <Text style={{
-              color: 'rgba(82,130,240,1)'
-            }}>Второй экран</Text>
-        </View>)
+          ? <View style={styles.headButtonFocusedLeft}>
+            <Text style={{textAlign: 'center', color: 'white'}}>Заказ</Text>
+          </View>
+          : <View style={styles.headButtonUnFocusedLeft}>
+            <Text style={{textAlign: 'center', color: 'rgba(82,130,240,1)'}}>Заказ</Text>
+          </View>
+      )
     }
   },
   Заказ2: {
-    screen: SecondActivity,
+    screen: createStackNavigator({
+      SecondActivity: {screen: SecondActivity,
+        navigationOptions: {
+          header: () => null
+        }},
+
+      DetailsOrder: {screen: DetailsOrder,
+        navigationOptions: {
+          header: () => null
+        }}
+    }),
+    initialRouteName: 'SecondActivity',
     navigationOptions: {
-      tabBarLabel: 'Еще',
-      tabBarLabel: ({focused, tintColor}) => (
+      tabBarLabel: ({focused}) => (
         focused
-        ? <View style={{
-            paddingVertical: 7,
-            paddingHorizontal: 20,
-            alignSelf: 'flex-start',
-            borderColor: 'rgba(82,130,240,1)',
-            borderTopRightRadius: 5,
-            borderBottomRightRadius: 5,
-            backgroundColor: 'rgba(82,130,240,1)',
-            borderWidth: 1
-          }}>
-          <Text style={{
-              color: 'white'
-            }}>Второй экран</Text>
-        </View>
-        : <View style={{
-            paddingVertical: 7,
-            paddingHorizontal: 20,
-            padding: 30,
-            flex: 1,
-            alignSelf: 'flex-start',
-            borderColor: 'rgba(82,130,240,1)',
-            borderTopRightRadius: 5,
-            borderBottomRightRadius: 5,
-            backgroundColor: 'white',
-            borderWidth: 1
-          }}>
-          <Text style={{
-              color: 'rgba(82,130,240,1)'
-            }}>Второй экран</Text>
-        </View>)
+          ? <View style={styles.headButtonFocusedRight}>
+            <Text style={{textAlign: 'center', color: 'white'}}>Мои заказы</Text>
+          </View>
+          : <View style={styles.headButtonUnFocusedRight}>
+            <Text style={{textAlign: 'center', color: 'rgba(82,130,240,1)'}}>Мои заказы</Text>
+          </View>
+      )
     }
   }
 
@@ -90,17 +53,68 @@ const HeadNavigator = createMaterialTopTabNavigator({
       padding: 0,
       paddingTop: 20,
       margin: 0,
-      paddingBottom: 20
+      paddingBottom: 13
     },
     style: {
       backgroundColor: '#fff',
-    
+      borderWidth: 0
     },
     indicatorStyle: {
+      width: 0,
       backgroundColor: 'white'
     }
   }
 
+})
+
+const styles = StyleSheet.create({
+  headButtonFocusedLeft: {
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    flex: 1,
+    alignSelf: 'stretch',
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+    borderColor: 'rgba(82,130,240,1)',
+    backgroundColor: 'rgba(82,130,240,1)',
+    borderWidth: 1
+  },
+  headButtonFocusedRight: {
+    alignSelf: 'stretch',
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    flex: 1,
+    borderColor: 'rgba(82,130,240,1)',
+    backgroundColor: 'rgba(82,130,240,1)',
+    borderWidth: 1
+  },
+  headButtonUnFocusedLeft: {
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    padding: 30,
+    flex: 1,
+    alignSelf: 'stretch',
+    borderColor: 'rgba(82,130,240,1)',
+    borderTopLeftRadius: 5,
+    borderBottomLeftRadius: 5,
+    backgroundColor: 'white',
+    borderWidth: 1
+  },
+
+  headButtonUnFocusedRight: {
+    paddingVertical: 7,
+    paddingHorizontal: 20,
+    padding: 30,
+    flex: 1,
+    alignSelf: 'stretch',
+    borderColor: 'rgba(82,130,240,1)',
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 5,
+    backgroundColor: 'white',
+    borderWidth: 1
+  }
 })
 
 export default createAppContainer(HeadNavigator)
