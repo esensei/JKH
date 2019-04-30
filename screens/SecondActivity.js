@@ -3,68 +3,48 @@ import {
   View,
   Text,
   StyleSheet,
-  Image
+  Image,
+  ScrollView
 } from 'react-native'
 
-import ActiveOrders from '../components/ActiveOrders'
 import HistoryOrders from '../components/HistoryOrders'
 
-const json = {
-  "activeOrders":[
-    {
-      "date": "21 декабря 2018 года",
-      "status":"active",
-      "delieveryDate": "~ в 18:30 21.12.2018",
-      "seller":"ИП Водичкин Ш.А.",
-      "totalPrice":"1 300p."
-    },
-    {
-      "date": "1 декабря 2010 года",
-      "status":"active",
-      "delieveryDate": "~ в 13:33 1.12.2010",
-      "seller":"ИП Петрху Ш.А.",
-      "totalPrice":"1 300p."
-    }
-    ],
-  "historyOrders":[
-     {
-      "date": "3 декабря 2012 года",
-      "status":"canceled",
-      "delieveryDate": "~ в 2:30 3.12.2012",
-      "seller":"ИП Водинцев Ш.А.",
-      "totalPrice":"3 343p."
-    }
-    ]
-}
-
 export default class SecondActivity extends Component {
-
-  onClickNavigate = (data, status, seller) => {
-    this.props.navigation.navigate('DetailsOrder', {data, status, seller})
+  onClickNavigate = (date, status, seller, products, subTotal, deliveryCost, totalPrice, deliveryDate) => {
+    this.props.navigation.navigate('DetailsOrder', {date, status, seller, products, subTotal, deliveryCost, totalPrice, deliveryDate})
   }
-
   render() {
-    const {h1, container, imageStyle} = styles
+    const json = this.props.screenProps
+
+    const {h1, container, imageStyle, lineStyle} = styles
     return (
-      <View>
+      <ScrollView>
         <View style={container}>
           <Image style={styles.imageStyle} source={require('../images/Thunder-move.png')} />
           <Text style={h1}>Активные заказы</Text>
         </View>
-        {json.activeOrders.map((value, key) => {
-          if ((key + 1) % 2 == 0) {
-            return (<ActiveOrders key={key} delieveryDate={value.delieveryDate} totalPrice={value.totalPrice} seller={value.seller} date={value.date} />
-            )
-          }})}
+        {json.orders.active.map((value, key) => (
+          <View key={key}>
+            <HistoryOrders data={value} subTotal={value.subTotal} totalPrice={value.fullCost} deliveryCost={value.deliveryCost} onClick={this.onClickNavigate} key={key} deliveryDate={value.deliveryDate} seller={value.seller} status={value.status} date={value.date} />
+            {((key % 2 === 0) && !((key + 1) === Object.keys(json.orders.active).length)) ?
+              <View style={lineStyle} /> : null
+            }
+          </View>)
+        )}
 
         <View style={container}>
           <Image style={imageStyle} source={require('../images/history-order.png')} />
           <Text style={h1}>История заказов</Text>
         </View>
-        {json.historyOrders.map((value, key) =>
-          <HistoryOrders onClick={this.onClickNavigate} key={key} delieveryDate={value.delieveryDate} totalPrice={value.totalPrice} seller={value.seller} status={value.status} date={value.date} />
-        )}
-    </View>)
+        {json.orders.history.map((value, key) => (
+          <View key={key}>
+            <HistoryOrders data={value} subTotal={value.subTotal} totalPrice={value.fullCost} deliveryCost={value.deliveryCost} onClick={this.onClickNavigate} key={key} deliveryDate={value.deliveryDate} seller={value.seller} status={value.status} date={value.date} />
+            {((key % 2 === 0) && !((key + 1) === Object.keys(json.orders.history).length)) ?
+              <View style={lineStyle} /> : null
+            }
+          </View>
+        ))}
+      </ScrollView>)
   }
 }
 
@@ -77,6 +57,11 @@ const styles = StyleSheet.create({
   imageStyle: {
     width: 30,
     height: 30
+  },
+  lineStyle: {
+    marginTop: 10,
+    borderBottomColor: 'rgba(216,216,216,1)',
+    borderBottomWidth: 2
   },
   h1: {
     marginLeft: 12,

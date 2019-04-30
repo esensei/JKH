@@ -30,13 +30,13 @@ class InfoNavigator extends Component {
       body: JSON.stringify({apitoken: userToken})
     })
 
-    const result = await response.json();
-    let arrayResult = [];
+    const result = await response.json()
+    let arrayResult = []
     for (const currentArray of result.alerts) {
       arrayResult = arrayResult.concat(currentArray)
     }
     this.setState({alerts: arrayResult})
-  };
+  }
 
   render() {
     const {circle, h1, h2, h3, linearGradient} = styles

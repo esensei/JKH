@@ -3,39 +3,51 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity
+  TouchableOpacity,
+  AsyncStorage
 } from 'react-native'
 
 import LinearGradient from 'react-native-linear-gradient'
+const url = 'http://borolis.party:3000/api/v1'
 
 class ServicesNavigator extends Component {
-  header: {
-    visible: false
+  constructor(props) {
+    super(props)
+    this.state = {
+      json: [],
+      visible: false
+    }
   }
+  componentDidMount = async () => {
+    const userToken = await AsyncStorage.getItem('apitoken')
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({apiToken: userToken, query: 'getBusinessesList'})
+    })
 
+
+    const result = await response.json()
+    this.setState({json: result})
+  }
   render() {
     const {buttonContainer, buttonStyle, linearGradient, body} = styles
+    if (this.state.json.length === 0) {
+      return (<LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient} />
+  )}
     return (
       <LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient}>
         <View style={body}>
-          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('TopTapBar')}>
-            <Text style={buttonStyle}>Домофон</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('InfoContainer')}>
-            <Text style={buttonStyle}>Заказать воду</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-            <Text style={buttonStyle}>Уборка квартиры</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-            <Text style={buttonStyle}>Мастер на дом</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-            <Text style={buttonStyle}>Трансфер</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={buttonContainer} onPress={() => this.props.navigation.navigate('Home')}>
-            <Text style={buttonStyle}>Показания ЖКХ</Text>
-          </TouchableOpacity>
+          {this.state.json.businessesList.map((value, key) => (
+            <TouchableOpacity key={key} style={buttonContainer}
+              onPress={() => this.props.navigation.navigate('InfoContainer', {id : value.id})}>
+              <Text style={buttonStyle}>{value.name}</Text>
+            </TouchableOpacity>
+          ))}
+
         </View>
       </LinearGradient>)
   }

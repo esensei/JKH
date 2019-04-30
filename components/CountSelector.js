@@ -3,12 +3,16 @@ import {
   View,
   Text,
   StyleSheet,
+  Dimensions,
   TouchableOpacity
 } from 'react-native'
 
+const width = Dimensions.get('window').width //full width
+const height = Dimensions.get('window').height //full width
+
 export default class CountSelector extends Component {
   render() {
-    const {h2, buttonTextOther, buttonTextCenter, countButton, countButtonMinus, countButtonPlus, countButtonCenter} = styles
+    const {h2, view, buttonTextOther, buttonTextCenter, countButton, countButtonMinus, countButtonPlus, countButtonCenter} = styles
     return (
       <View>
         <Text style={h2}>{this.props.name}</Text>
@@ -42,14 +46,15 @@ const styles = StyleSheet.create({
   },
   countButtonMinus: {
     borderTopLeftRadius: 5,
-    width: 45,
-    height: 36,
+    width: 0.12 * width,
+    height: 0.044 * height,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'rgba(82,130,240,1)',
     borderBottomLeftRadius: 5
   },
   h2: {
+    textAlign: 'left',
     paddingTop: 12,
     paddingBottom: 5,
     color: 'grey',
@@ -61,15 +66,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: 56,
-    height: 56,
+    width: 0.139 * width,
+    height: 0.064 * height,
     borderColor: 'rgba(82,130,240,1)'
   },
   countButtonPlus: {
-    width: 45,
+    width: 0.12 * width,
     alignItems: 'center',
     justifyContent: 'center',
-    height: 36,
+    height: 0.044 * height,
     borderTopRightRadius: 5,
     backgroundColor: 'rgba(82,130,240,1)',
     borderBottomRightRadius: 5

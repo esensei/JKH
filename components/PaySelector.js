@@ -12,11 +12,11 @@ const width = Dimensions.get('window').width //full width
 const formsPay = [
   {
     label: 'Наличными',
-    value: 'nal'
+    value: 'cash'
   },
   {
-    label: 'Оплата онлайн',
-    value: 'beznal'
+    label: 'В счет ЖКХ',
+    value: 'jkh'
   }
 ]
 

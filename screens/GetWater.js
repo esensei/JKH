@@ -12,30 +12,6 @@ import DateTimePicker from 'react-native-modal-datetime-picker'
 import CountSelector from '../components/CountSelector'
 import PaySelector from '../components/PaySelector'
 
-const json = {
-  name: 'Доставка воды',
-  countSelector: [
-    {
-      label: '3л',
-      value: '50'
-    },
-    {
-      label: '5л',
-      value: '100'
-    },
-    {
-      label: '19л',
-      value: '500'
-    }
-  ],
-  date: 'true',
-  pay: 'true',
-  additional: [
-    'Помпа',
-    'Насос'
-  ]
-}
-
 const width = Dimensions.get('window').width //full width
 const height = Dimensions.get('window').height //full height
 
@@ -43,12 +19,15 @@ class GetWater extends Component {
   constructor(props) {
     super(props)
     this.state = {
+      order: {},
       placeholder_color: 'rgb(201,201,206)',
       data: 'Выберите дату',
       date_now: new Date(),
       time: 'Выберите время',
       isPompa: false,
-      count: 0,
+      date: false,
+      count: 1,
+      cost: 0,
       formsPay: null,
       isCooler: false,
       timeZoneOffsetInHours: (-1) * (new Date()).getTimezoneOffset() / 60,
@@ -57,33 +36,92 @@ class GetWater extends Component {
       favSport0: 0,
       favSport1: undefined
     }
+    this._handleDatePicked.bind(this)
   }
-  onClickMinus = () => {
-    this.setState({count: (this.state.count === 0) ? this.state.count : this.state.count - 1})
+
+  componentWillMount = () => {
+    const json = this.props.screenProps
+    const {countSelectors, additionals} = json.createOrderFields
+    const arr = new Array(countSelectors.length)
+    const add = new Array(additionals.length)
+    for (let i = 0; i < arr.length; i++) {
+      arr[i] = {name: null, cost: '0', quantity: 1}
+    }
+    for (let i = 0; i < add.length; i++) {
+      add[i] = {name: null, cost: 0, quantity: 1, checked: false}
+    }
+    const full = {fullCost: null, deliveryDate: null, products: arr}
+    console.log(full)
+    this.setState({order: full, additionals: add })
   }
-  onClickPlus = () => {
-    this.setState({count: this.state.count + 1})
+  onClickMinus = (value) => {
+    const new_state = Object.assign({}, this.state.order.products)
+    if (new_state[value].quantity === 0) return
+    new_state[value].quantity -= 1
+    this.setState({count: this.state.count - 1,
+      order: Object.assign({}, this.state.order, {products: new_state})
+    })
+  }
+  onClickPlus = (value) => {
+    const new_state = Object.assign({}, this.state.order.products)
+    new_state[value].quantity += 1
+    this.setState({count: this.state.count + 1,
+      order: Object.assign({}, this.state.order, {products: new_state})
+    })
   }
   _showDateTimePicker = () => this.setState({ isDatePickerVisible: true })
   _hideDatePicker = () => this.setState({ isDatePickerVisible: false })
   _handleDatePicked = (date) => {
-    let dat = date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear()
+    const dat = date.getDate() + '.' + (date.getMonth() + 1) + '.' + date.getFullYear()
     this.setState({data: dat,
-      placeholder_color: 'black'
+      placeholder_color: 'black',
+      order: Object.assign({}, this.state.order, {deliveryDate: dat})
     })
     this._hideDatePicker()
   }
+   updateCost = () => {
+     let count = 0
+     this.state.additionals.forEach((value) => {
+       value.checked ?
+       count += value.cost
+       : null
+     })
+     let arr = Object.assign([], this.state.order.products)
+     arr.forEach((value) => {
+       count += Number(value.cost) * Number(value.quantity)
+     })
+     // this.setState({cost: count})
+     return count
+   }
+
+   additionalToJSON = () => {
+     const result = []
+     this.state.additionals.forEach((value) => {
+     value.checked ?
+         result.push({name : value.name, cost: value.cost, quantity : value.quantity})
+         : null
+     })
+     return (result)
+   }
+
+  returnOnServer = () => {
+    const addit = this.additionalToJSON()
+    const new_state = Object.assign([], this.state.order.products)
+    let con = new_state.concat(addit)
+    this.setState({
+        order:  Object.assign({}, this.state.order, {fullCost: this.updateCost(), products: con})
+    }, () => {console.log(this.state.order)
+      this.componentWillMount()
+    }
+    )}
 
   render() {
-    const placeholder = {
-      label: 'Выберите объем',
-      value: null,
-      color: 'black'
-    }
+    const json = this.props.screenProps
     const {h2, h3, orderText, placeContainer, orderButton, orderContainer, dataPicker, pickerContainer} = styles
     return (
       <View>
         <View style={pickerContainer}>
+          {json.createOrderFields.date &&
           <View style={placeContainer}>
             <Text style={h2}>Дата доставки</Text>
             <TouchableOpacity style={dataPicker} onPress={this._showDateTimePicker}>
@@ -97,55 +135,66 @@ class GetWater extends Component {
               mode={'datetime'}
             />
           </View>
-          <View style={{ flexGrow: 0.1 }} />
+          }
+          {json.createOrderFields.pickers.map((source, key) =>
+            (<View key={key} style={placeContainer}>
+              <Text style={h2}>{source.title}</Text>
+              <RNPickerSelect
+                placeholder={{
+                  label: source.placeholder,
+                  value: 0,
+                  color: 'black'}}
+                items={source.list}
+                onValueChange={(value, index) => {
+                  const new_state = Object.assign({}, this.state.order.products)
+                  new_state[source.id].cost = value
+                  new_state[source.id].name = `${source.name} ${index === 0 ? null : source.list[index - 1].label}`
+                  this.setState({
+                    order: Object.assign({}, this.state.order, {products: new_state})
+                  })
+                }}
+                style={styles}
+                value={this.state.order.products[source.id].cost}
+              />
+            </View>
+            ))}
+          {json.createOrderFields.countSelectors.map((value, key) => (
+            <View key={key} style={placeContainer}>
+              <CountSelector name={value.title} count={this.state.order.products[value.pickerID].quantity} onClickMinus={() => this.onClickMinus(value.pickerID)} onClickPlus={() => this.onClickPlus(value.pickerID)} />
+            </View>
+          ))}
           <View style={placeContainer}>
-            <Text style={h2}>Объем бутылей</Text>
-            <RNPickerSelect
-              placeholder={placeholder}
-              items={json.countSelector}
-              onValueChange={value => {
-                this.setState({
-                  favSport0: value
-                })
-              }}
-              style={styles}
-              value={this.state.favSport0}
-            />
+            <PaySelector text={'Оплата'} formsPay={this.state.formsPay} setPayout={value => this.setState({order: Object.assign({}, this.state.order, {payMethod: value}) })} />
           </View>
         </View>
-
         <View>
           <Text style={h2}>Дополнительные услуги</Text>
-          {json.additional.map((value, key) =>
+          {json.createOrderFields.additionals.map((value, key) =>
             (<CheckBox
               key={key}
               style={{ padding: 10}}
               onClick={() => {
-                this.setState({
-                  isPompa: !this.state.isPompa
-                })
+                const { additionals } = Object.assign({}, this.state)
+                additionals[key].checked = !additionals[key].checked
+                additionals[key].cost = Number(value.cost)
+                additionals[key].name = value.name
+
+                this.setState(
+                  {additionals}
+                )
               }}
-              isChecked={this.state.isPompa}
-              rightTextView={<Text style={{marginLeft: 10, fontSize: 16, color: 'rgba(52,52,52,1)'}}>{value} <Text style={{color: 'grey'}}>+ ЦЕНА.</Text></Text>}
+              isChecked={this.state.additionals[key].checked}
+              rightTextView={<Text style={{marginLeft: 10, fontSize: 16, color: 'rgba(52,52,52,1)'}}>{value.title} <Text style={{color: 'grey'}}>+ {value.cost}р.</Text></Text>}
               checkBoxColor={'rgba(82,130,240,1)'}
             />)
           )}
         </View>
-        <View style={pickerContainer}>
-          <View style={placeContainer}>
-            <CountSelector name={'Количество бутылей'} count={this.state.count} onClickMinus={this.onClickMinus} onClickPlus={this.onClickPlus} />
-          </View>
-          <View style={{flexGrow: 0.1}} />
-          <View style={placeContainer}>
-            <PaySelector text={'Оплата'} formsPay={this.state.formsPay} setPayout={value => { this.setState({formsPay: value}) }} />
-          </View>
-        </View>
         <View>
           <Text style={h2}>К оплате</Text>
-          <Text style={h3}>{this.state.count * this.state.favSport0}</Text>
+          <Text style={h3}>{this.updateCost()}р.</Text>
         </View>
         <View style={orderContainer}>
-          <TouchableOpacity style={orderButton}>
+          <TouchableOpacity onPress={() => { this.returnOnServer() }} style={orderButton}>
             <Text style={orderText}>Заказать</Text>
           </TouchableOpacity>
         </View>
@@ -160,13 +209,14 @@ const styles = StyleSheet.create({
   linearGradient: {
     flex: 1,
     borderRadius: 5,
-    paddingTop: 60,
+    paddingTop: 60
   },
   orderContainer: {
+
     marginTop: 30,
     alignItems: 'stretch',
     justifyContent: 'center',
-    paddingHorizontal: 0.1 * width
+    paddingHorizontal: 0.09 * width
   },
   orderButton: {
     alignItems: 'center',
@@ -221,7 +271,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderTopLeftRadius: 13,
     borderTopRightRadius: 13,
-    height: height
+    height
   },
   pickerContainer: {
     flexDirection: 'row',
@@ -233,12 +283,11 @@ const styles = StyleSheet.create({
   placeContainer: {
     flexDirection: 'column',
     justifyContent: 'space-around'
-
-
   },
   inputIOS: {
     color: 'black',
     alignSelf: 'stretch',
+    width: width * 0.448,
     fontSize: 16,
     paddingVertical: 12,
     paddingTop: 15,

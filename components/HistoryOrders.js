@@ -9,9 +9,10 @@ import {
 
 export default class HistoryOrders extends Component {
   onHandle = () => {
-    this.props.onClick(this.props.date, getStatus(this.props.status), this.props.seller)
+    this.props.onClick(this.props.date, getStatus(this.props.status), this.props.seller, this.props.data.products, this.props.subTotal, this.props.deliveryCost, this.props.totalPrice, this.props.deliveryDate)
   }
   render() {
+    const {date, status, deliveryDate, seller, totalPrice} = this.props
     const {container, h1, h2, image, stringContainer} = styles
     return (
       <TouchableOpacity onPress={this.onHandle} style={container}>
@@ -25,7 +26,7 @@ export default class HistoryOrders extends Component {
         </View>
         <View style={stringContainer}>
           <Text style={h2}>Дата доставки</Text>
-          <Text style={h2}>{this.props.delieveryDate}</Text>
+          <Text style={h2}>{this.props.deliveryDate}</Text>
         </View>
         <View style={stringContainer}>
           <Text style={h2}>Продавец</Text>
@@ -45,6 +46,10 @@ function getStatus(status) { //status=(closed|cancel)
   case 'closed':
     return (
       <Text style={[styles.h2, {color: 'rgba(64,193,67,1)'}]}>Завершен</Text>
+    )
+  case 'active':
+    return (
+      <Text style={[styles.h2, {color: 'rgba(82,130,240,1)'}]}>Активный</Text>
     )
   case 'canceled':
     return (
