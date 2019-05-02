@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Image
 } from 'react-native'
-
+import {connect} from 'react-redux'
 import CountSelector from '../components/CountSelector'
 
 const height = Dimensions.get('window').height
@@ -17,23 +17,16 @@ const width = Dimensions.get('window').width
 
 class detailTemp2 extends Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
-      id: 0,
-      title: 'Пицца Винченцо фирменная',
-      composition: 'Бекон, Лосось, Лук красный, Моцарелла, укроп',
-      countSelector: true,
-      weight: 1000,
-      count: 0,
-      cost: 400
+      count: 0
     }
   }
   componentWillMount = () => {
     AsyncStorage.removeItem('Cart')
     AsyncStorage.getItem('Cart', (err, res) => { console.log(JSON.parse(res)) })
   }
-
   onClickPlus = () => {
     const c = this.state.count + 1
     this.setState({count: c})
@@ -43,13 +36,13 @@ class detailTemp2 extends Component {
     c <= 0 ? c : c--
     this.setState({count: c})
   }
+  addToCart = (product) => {
+    this.props.dispatch({type: 'addToCart', product})
+  }
 
-  saveData() {
-    const {cost, weight, count, id, title, composition} = this.state
-    console.log('We are in SAve function')
+  saveData(cost, weight, count, id, title, composition) {
     try {
-    let product = []
-    let items = {
+      const items = {
         id,
         title,
         cost,
@@ -57,37 +50,18 @@ class detailTemp2 extends Component {
         weight,
         composition
       }
-
-      AsyncStorage.getItem('Cart', (err, res) => {
-        if (!res) {
-          product.push(items)
-          alert('Добавлен в пустой')
-          AsyncStorage.setItem('Cart', JSON.stringify(product))
-        } else {
-          alert('Добавлен в сущ')
-          product = JSON.parse(res)
-          let pars = JSON.parse(res)
-          pars.map((value, index) => {
-            if (value.id === items.id) {
-              pars[index].count += count
-              AsyncStorage.setItem('Cart', JSON.stringify(pars), alert(pars[index].count))
-              return
-            }
-          })
-          product.push(items)
-          AsyncStorage.setItem('Cart', JSON.stringify(product),
-            console.log('item added ' + JSON.stringify(product)))
-        }
-
-      })
+      this.addToCart(items)
     } catch (error) {
       alert(error)
     }
   }
 
   render() {
-    const {image,orderButton, orderText, container, h2, textContainer, columnContainer, h3, custom, containerHead, h1, subContainer} = styles
-    const {count, cost, description, composition, weight} = this.state
+    const {image, orderButton, orderText, container, h2, textContainer, columnContainer, h3, custom, containerHead, h1, subContainer} = styles
+
+    const {items, id} = this.props.navigation.state.params
+    const item = items[id]
+      const {cost, title, description, composition, weight} = item
     return (
       <View style={container}>
         <TouchableOpacity onPress={() => this.props.navigation.navigate('menuTemp2')} style={containerHead}>
@@ -95,7 +69,7 @@ class detailTemp2 extends Component {
             <Image style={{height: 20, width: 10}} source={require('../images/cardTapFlip.png')} />
           </View>
           <View style={subContainer}>
-            <Text style={h1}>{this.props.navigation.state.params.name}</Text>
+            <Text style={h1}>{title}</Text>
           </View>
         </TouchableOpacity>
         <ScrollView>
@@ -106,7 +80,7 @@ class detailTemp2 extends Component {
           <Text style={h3}>{description} </Text>
           <Text style={h2}>Состав</Text>
           <Text style={h3}>{composition}.</Text>
-          <CountSelector name={'Количество'} count={count} onClickMinus={() => this.onClickMinus()} onClickPlus={() => this.onClickPlus()} />
+          <CountSelector name={'Количество'} count={this.state.count} onClickMinus={() => this.onClickMinus()} onClickPlus={() => this.onClickPlus()} />
           <View styles={columnContainer}>
             <View style={textContainer}>
               <Text style={h2}>Масса 1 шт.</Text>
@@ -114,10 +88,10 @@ class detailTemp2 extends Component {
             </View>
             <View style={textContainer}>
               <Text style={h2}>Стоимость</Text>
-              <Text style={h3}>{cost * count}р.</Text>
+              <Text style={h3}>{cost * this.state.count}р.</Text>
             </View>
           </View>
-          <TouchableOpacity onPress={() => { this.saveData() }} style={orderButton}>
+          <TouchableOpacity onPress={() => { this.saveData(cost, weight, this.state.count, id, title, composition) }} style={orderButton}>
             <Text style={orderText}>Добавить в корзину</Text>
           </TouchableOpacity>
         </ScrollView>
@@ -125,6 +99,9 @@ class detailTemp2 extends Component {
     )
   }
 }
+
+export default connect(this.addToCart)(detailTemp2)
+
 
 const styles = StyleSheet.create({
   h1: {
@@ -188,6 +165,3 @@ const styles = StyleSheet.create({
     height: 0.21 * height
   }
 })
-
-
-export default detailTemp2

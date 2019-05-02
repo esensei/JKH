@@ -4,56 +4,55 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  AsyncStorage
+  ActivityIndicator
 } from 'react-native'
-
 import LinearGradient from 'react-native-linear-gradient'
-const url = 'http://borolis.party:3000/api/v1'
+import { connect } from 'react-redux'
+import { servicesFetchData } from '../actions/items'
 
 class ServicesNavigator extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      json: [],
-      visible: false
-    }
-  }
   componentDidMount = async () => {
-    const userToken = await AsyncStorage.getItem('apitoken')
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({apiToken: userToken, query: 'getBusinessesList'})
-    })
-
-
-    const result = await response.json()
-    this.setState({json: result})
+    this.props.fetchData()
   }
   render() {
     const {buttonContainer, buttonStyle, linearGradient, body} = styles
-    if (this.state.json.length === 0) {
-      return (<LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient} />
-  )}
+    if (this.props.hasErrored) {
+      alert(`Ошибка загрузки ${hasErrored}`.hasErrored)
+    }
+    if (this.props.items.length === 0) {
+      return (
+        <LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient} >
+          <ActivityIndicator size="large" color="white" />
+        </LinearGradient>)
+    }
     return (
       <LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient}>
         <View style={body}>
-          {this.state.json.businessesList.map((value, key) => (
-            <TouchableOpacity key={key} style={buttonContainer}
-              onPress={() => this.props.navigation.navigate('InfoContainer', {id : value.id})}>
+          {this.props.items.businessesList.map((value, key) => (
+            <TouchableOpacity key={key} style={buttonContainer} onPress={() => this.props.navigation.navigate('InfoContainer', {id: value.id})}>
               <Text style={buttonStyle}>{value.name}</Text>
             </TouchableOpacity>
           ))}
-
         </View>
       </LinearGradient>)
   }
 }
 
-export default ServicesNavigator
+const mapStateToProps = (state) => {
+  return {
+    items: state.service.services,
+    hasErrored: state.service.itemsHasErrored,
+    isLoading: state.service.itemsIsLoading
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchData: () => dispatch(servicesFetchData())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(ServicesNavigator)
 
 const styles = StyleSheet.create({
   linearGradient: {

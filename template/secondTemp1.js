@@ -8,26 +8,38 @@ import {
   Dimensions,
   TouchableOpacity
 } from 'react-native'
+import {connect} from 'react-redux'
+import MenuPiece from './menuPiece'
 
 const width = Dimensions.get('window').width //full width
 
 
-export default class secodTemp1 extends Component {
+class secondTemp1 extends Component {
   render() {
-    const {h1, h2, container, h2Menu, image, lineStyle} = styles
+    const {h1, h2, lineStyle} = styles
     return (
       <ScrollView>
-        <Text style={h1}>Пиццерия помидорка</Text>
-        <Text style={h2}>Наши курьеры доставляют заказы во все районы города и всего за 30 минут. Оплатить покупку предлагаем банковской картой онлайн, а также картой и наличными курьеру при получении. Минимальная стоимость заказа для услуги бесплатной доставки - 450 рублей с учетом всех скидок и промокодов.</Text>
+        <Text style={h1}>{this.props.name}</Text>
+        <Text style={h2}>{this.props.description}</Text>
         <Text style={[h2, {color: 'gray'}]}>Меню</Text>
-        <TouchableOpacity onPress={() => this.props.navigation.navigate('menuTemp2')} style={container}>
-          <Text style={h2Menu}>Пицца</Text>
-          <Image style={image} source={require('../images/cardTap.png')} />
-        </TouchableOpacity>
+        {this.props.typeOfMenu.map((value, key) => (
+          <MenuPiece key={key} name={value.name} id={value.id} nav={this.props.navigation} />
+        ))}
+
         <View style={lineStyle} />
       </ScrollView>)
   }
 }
+
+const mapStateToProps = (state) => {
+  return {
+    name: state.menu.data.name,
+    description: state.menu.data.description,
+    typeOfMenu: state.menu.data.menu
+  }
+}
+
+export default connect(mapStateToProps)(secondTemp1)
 
 const styles = StyleSheet.create({
   h1: {
@@ -38,21 +50,6 @@ const styles = StyleSheet.create({
   h2: {
     marginTop: 0.025 * width,
     fontSize: 16
-  },
-  h2Menu: {
-    fontSize: 16
-  },
-
-  image: {
-    width: 10,
-    height: 20
-  },
-  container: {
-    marginTop: 0.025 * width,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    flexShrink: 2,
-    flexWrap: 'wrap'
   },
   lineStyle: {
     marginTop: 10,

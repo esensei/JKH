@@ -8,6 +8,8 @@ import {
   AsyncStorage,
   TouchableOpacity
 } from 'react-native'
+import {connect} from 'react-redux'
+
 import HeadNavigator from '../components/HeadNavigator'
 import HeadNavigator2 from '../components/HeadNavigator2'
 
@@ -36,12 +38,72 @@ class InfoContainer extends Component {
       body: JSON.stringify({apiToken: userToken, query: 'getBusinessPageByID', data: {businessID: this.props.navigation.state.params.id}
       })
     })
-
+    this.getMenu()
     const result = await response.json()
     this.setState({json: result})
   }
 
-
+  getMenu = () => {
+    const onSuccess = (success) => {
+      this.props.dispatch({ type: 'menuFetched', payload: success.createOrderFields})
+      return success
+    }
+    const onError = (error) => {
+      console.log(error)
+      alert('Ошибка получения данных')
+    }
+    try {
+      const success = {
+        "createOrderFields": {
+          "name": "Пиццерия Помидорка",
+          "description": "Наши гастарбайтеры доставляют заказы во все районы города и всего за 30 минут. Оплатить покупку предлагаем банковской картой онлайн, а также картой и наличными курьеру при получении. Минимальная стоимость заказа для услуги бесплатной доставки - 450 рублей с учетом всех скидок и промокодов.",
+          "menu": [
+            {
+              "id": "0",
+              "name": "Пицца",
+              "products": [
+                {
+                  "id": "0",
+                  "title": "Пицца Винченцо фирменная",
+                  "composition": "Бекон, Лосось, Лук красный, Моцарелла, укроп",
+                  "countSelector": "true",
+                  "weight": "800",
+                  "cost": "450",
+                  "image": [
+                    {
+                      "url": "https://recipes.timesofindia.com/photo/53110049.cms"
+                    },
+                    {
+                      "url": "https://d2gk7xgygi98cy.cloudfront.net/20-4-facebook.jpg"
+                    }
+                  ]
+                },
+                {
+                  "id": "1",
+                  "title": "Пицца Бориса острая",
+                  "composition": "Бекон, Курица, Халапеньо, Моцарелла",
+                  "countSelector": "true",
+                  "weight": "1200",
+                  "cost": "325",
+                  "image": [
+                    {
+                      "url": "https://recipes.timesofindia.com/photo/53110049.cms"
+                    },
+                    {
+                      "url": "https://d2gk7xgygi98cy.cloudfront.net/20-4-facebook.jpg"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+      return onSuccess(success)
+    } catch (error) {
+      return onError(error)
+    }
+  }
 
   render() {
     const {linearGradient, h1, container} = styles
@@ -94,4 +156,4 @@ const styles = StyleSheet.create({
   }
 })
 
-export default InfoContainer
+export default connect(this.getMenu)(InfoContainer)

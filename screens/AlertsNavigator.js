@@ -3,47 +3,29 @@ import LinearGradient from 'react-native-linear-gradient'
 import {
   View,
   Text,
-  AsyncStorage,
   StyleSheet,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native'
+import { connect } from 'react-redux'
+import { alertsFetchData } from '../actions/alerts'
 
-const url_alerts = 'http://borolis.party/getalerts.php'
-
-class InfoNavigator extends Component {
-  constructor() {
-    super()
-    this.state = {
-      data: [],
-      alerts: ['kekus']
-    }
-  }
-
-  componentWillMount = async () => {
-    const userToken = await AsyncStorage.getItem('apitoken')
-    const response = await fetch(url_alerts, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({apitoken: userToken})
-    })
-
-    const result = await response.json()
-    let arrayResult = []
-    for (const currentArray of result.alerts) {
-      arrayResult = arrayResult.concat(currentArray)
-    }
-    this.setState({alerts: arrayResult})
+class AlertsNavigator extends Component {
+  componentDidMount = async () => {
+    this.props.fetchData()
   }
 
   render() {
     const {circle, h1, h2, h3, linearGradient} = styles
+    if (this.props.alerts.length == 0) {
+      return (  <LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient} >
+          <ActivityIndicator size="large" color="white" />
+        </LinearGradient>)
+    }
     return (<LinearGradient colors={['rgba(61,78,129,1)', 'rgba(87,83,201,1)', 'rgba(110,127,243,1)']} style={linearGradient}>
       <ScrollView>
         {
-          this.state.alerts.map((item, index) => (<View key={index} style={circle}>
+          this.props.alerts.map((item, index) => (<View key={index} style={circle}>
             <Text style={h1}>{item.content}</Text>
             <Text style={h2}>{item.alert_date_human}</Text>
             <Text style={h3}>{item.address}</Text>
@@ -53,11 +35,28 @@ class InfoNavigator extends Component {
     </LinearGradient>)
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    alerts: state.alerts.alerts,
+    hasErrored: state.alerts.itemsHasErrored,
+    isLoading: state.alerts.itemsIsLoading
+  }
+}
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    fetchData: () => dispatch(alertsFetchData())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(AlertsNavigator)
+
 const styles = StyleSheet.create({
   linearGradient: {
     flex: 1,
     paddingLeft: 16,
     paddingRight: 16,
+    justifyContent: 'center',
     paddingTop: 50
   },
   h1: {
@@ -82,5 +81,3 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,1)'
   }
 })
-
-export default InfoNavigator

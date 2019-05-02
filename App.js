@@ -1,8 +1,12 @@
+import React, { Component } from 'react'
+import { Provider } from 'react-redux'
+import {StatusBar, View} from 'react-native'
 import {createStackNavigator, createAppContainer, createSwitchNavigator} from 'react-navigation'
 import AuthLoadingScreen from './screens/AuthLoadingScreen'
 import bottomMenu from './components/BottomMenu'
 import AddNavigator from './screens/AddNavigator'
 import LoginNavigator from './screens/LoginNavigator'
+import store from './stores'
 
 const SwitchNavigator = createSwitchNavigator(
   {
@@ -38,6 +42,17 @@ const AppStackNavigator = createStackNavigator({
 {
   initialRouteName: 'Login'
 })
-
-const App = createAppContainer(AppStackNavigator)
-export default App
+const Stack = createAppContainer(AppStackNavigator)
+export default class App extends Component {
+  render() {
+    return (
+      <Provider store={store}>
+        <Stack />
+        <StatusBar
+          backgroundColor="white"
+          barStyle="light-content"
+        />
+      </Provider>
+    )
+  }
+}

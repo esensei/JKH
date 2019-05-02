@@ -7,9 +7,10 @@ import {
   Image,
   ScrollView
 } from 'react-native'
+import {connect} from 'react-redux'
 import ImageCard from '../components/ImageCard'
 
-export default class menuTemp2 extends Component {
+class menuTemp2 extends Component {
   constructor(props) {
     super(props)
 
@@ -17,8 +18,9 @@ export default class menuTemp2 extends Component {
       name: 'Пицца Винченцо фирменная'
     }
   }
-  onClickNavigate = (name, image) => {
-    this.props.navigation.navigate('detailTemp2', {name, image})
+  onClickNavigate = (name, image, id) => {
+    const items = this.props.items
+    this.props.navigation.navigate('detailTemp2', {name, image, id, items})
   }
   render() {
     const {h1, container, subContainer, lineStyle} = styles
@@ -33,14 +35,25 @@ export default class menuTemp2 extends Component {
           </View>
         </TouchableOpacity>
         <ScrollView>
-          <View onPress={() => console.log('kek')}>
-            <ImageCard onClick={this.onClickNavigate} text={'Пицца Винченцо фирменная'} />
-          </View>
+          {this.props.items.map((value, key) => (
+            <View key={key}>
+              <ImageCard id={value.id} onClick={this.onClickNavigate} text={value.title} />
+            </View>
+          ))}
+
         </ScrollView>
       </View>
     )
   }
 }
+const mapStateToProps = (state, ownProps) => {
+  return {
+    items: state.menu.data.menu[ownProps.navigation.state.params.id].products
+  }
+}
+
+
+export default connect(mapStateToProps)(menuTemp2)
 
 const styles = StyleSheet.create({
 

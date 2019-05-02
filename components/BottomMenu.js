@@ -6,7 +6,7 @@ import {
 import { createStackNavigator, createBottomTabNavigator, createAppContainer } from 'react-navigation'
 import ServicesNavigator from '../screens/ServicesNavigator'
 import AddNavigator from '../screens/AddNavigator'
-import InfoNavigator from '../screens/InfoNavigator'
+import AlertsNavigator from '../screens/AlertsNavigator'
 import InfoContainer from '../screens/InfoContainer'
 import HeadNavigator from './HeadNavigator'
 
@@ -38,7 +38,7 @@ const TabNavigator = createBottomTabNavigator({
     }
   },
   Информация: {
-    screen: InfoNavigator,
+    screen: AlertsNavigator,
     navigationOptions: {
       tabBarLabel: 'Информация',
       tabBarIcon: ({focused}) => (

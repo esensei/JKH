@@ -9,12 +9,13 @@ import {
   ScrollView,
   AsyncStorage
 } from 'react-native'
+import {connect} from 'react-redux'
+
 import PaySelector from '../components/PaySelector'
 
 const width = Dimensions.get('window').width //full width
 
-
-export default class secodTemp2 extends Component {
+class secondTemp2 extends Component {
   constructor(props) {
     super(props)
 
@@ -22,30 +23,35 @@ export default class secodTemp2 extends Component {
       cart: []
     }
   }
-  componentDidMount = () => {
-    AsyncStorage.getItem('Cart', (err, res) => {
-      if (!res) {
-        return
-      }
-      this.setState( {cart: JSON.parse(res)})
-    })
+  // componentDidMount = () => {
+  //   AsyncStorage.getItem('Cart', (err, res) => {
+  //     if (!res) {
+  //       return
+  //     }
+  //     this.setState( {cart: JSON.parse(res)})
+  //   })
+  // }
+  // componentDidUpdate = () =>  {
+  //   AsyncStorage.getItem('Cart').then(response => {
+  //     this.setState({cart: JSON.parse(response)})
+  //   }).done()
+  // }
+  orderDone = () => {
+    this.props.dispatch({type: 'orderDone'})
+    alert('Заказ успешно оформлен')
   }
-  componentDidUpdate = () =>  {
-    AsyncStorage.getItem('Cart').then(response => {
-      this.setState({cart: JSON.parse(response)})
-    }).done()
-  }
-
   render() {
-    const {cart} = this.state
+
+
     const {h2, input, container, pickerContainer, placeContainer, orderText, orderButton, orderContainer, lineStyle} = styles
     return (
       <ScrollView>
         <Text style={[h2, {color: 'rgba(52,52,52,1)'}]}>Заказ</Text>
-        {cart.map((value, index) => (
+        {this.props.items.map((value, index) => (
           <View key={index}>
             <TouchableOpacity style={container}>
               <Text style={h2}>{value.title}</Text>
+              <Text style={h2}>{value.count}</Text>
               <Text style={h2}>{value.cost}р.</Text>
             </TouchableOpacity>
             <View style={lineStyle} />
@@ -57,20 +63,30 @@ export default class secodTemp2 extends Component {
         <View style={pickerContainer}>
           <View style={placeContainer}>
             <Text style={[h2, {color: 'rgba(52,52,52,1)'}]}>К оплате</Text>
-            <Text style={h2}>1000р.</Text>
+            <Text style={h2}>{this.props.total}р.</Text>
           </View>
           <View style={placeContainer}>
             <PaySelector text={'Оплата'}   />
           </View>
         </View>
         <View style={orderContainer}>
-          <TouchableOpacity  style={orderButton}>
+          <TouchableOpacity onPress={() => { this.orderDone() }} style={orderButton}>
             <Text style={orderText}>Заказать</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>)
   }
 }
+const mapStateToProps = (state) => {
+  return {
+    items: state.cart.items,
+    total: state.cart.total
+    }
+}
+
+
+export default connect(mapStateToProps, this.orderDone)(secondTemp2)
+
 
 const styles = StyleSheet.create({
   orderText: {
